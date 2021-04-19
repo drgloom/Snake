@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Net
+namespace Snake
 {
     class Program
     {
