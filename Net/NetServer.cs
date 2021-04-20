@@ -1,44 +1,77 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
+using System.Net;
+using System.Text;
+using System.Threading;
+ 
 namespace Snake
 {
-    public class NetServer : Net
+    public class NetServer
     {
-        public NetServer() { }
-
-        public NetServer(string ipAddress, int port) : base(ipAddress, port) { }
-
-        public void Start()
+        static TcpListener tcpListener; // сервер для прослушивания
+        List<NetClient> clients = new List<NetClient>(); // все подключения
+ 
+        protected internal void AddConnection(NetClient clientObject)
+        {
+            clients.Add(clientObject);
+        }
+        protected internal void RemoveConnection(string id)
+        {
+            // получаем по id закрытое подключение
+            NetClient client = clients.FirstOrDefault(c => c.Id == id);
+            // и удаляем его из списка подключений
+            if (client != null)
+                clients.Remove(client);
+        }
+        // прослушивание входящих подключений
+        protected internal void Listen()
         {
             try
             {
-                _socket.Bind(_ip,_port);
-                _socket.Listen(10);
+                tcpListener = new TcpListener(IPAddress.Any, 8888);
+                tcpListener.Start();
+                Console.WriteLine("Сервер запущен. Ожидание подключений...");
+ 
+                while (true)
+                {
+                    TcpClient tcpClient = tcpListener.AcceptTcpClient();
+ 
+                    NetClient netClient = new NetClient(tcpClient, this);
+                    Thread clientThread = new Thread(new ThreadStart(netClient.Process));
+                    clientThread.Start();
+                }
             }
-            catch (ObjectDisposedException)
+            catch(Exception ex)
             {
-                throw new Exception("Socket был закрыт");
-            }
-            catch (SocketException)
-            {
-                throw new Exception("Произошла ошибка при попытке доступа к сокету");
+                Console.WriteLine(ex.Message);
+                Disconnect();
             }
         }
-
-        public Net NewClient()
+ 
+        // трансляция сообщения подключенным клиентам
+        protected internal void BroadcastMessage(string message, string id)
         {
-            NetClient net;
-            try
+            byte[] data = Encoding.Unicode.GetBytes(message);
+            for (int i = 0; i < clients.Count; i++)
             {
-                var socket = _socket.Accept();
-                net = new NetClient(socket);
+                if (clients[i].Id!= id) // если id клиента не равно id отправляющего
+                {
+                    clients[i].Stream.Write(data, 0, data.Length); //передача данных
+                }
             }
-            catch (Exception)
+        }
+        // отключение всех клиентов
+        protected internal void Disconnect()
+        {
+            tcpListener.Stop(); //остановка сервера
+ 
+            for (int i = 0; i < clients.Count; i++)
             {
-                throw new Exception("Ошибка при установлении соединения с клиентом");
+                clients[i].Close(); //отключение клиента
             }
-
-            return net;
+            Environment.Exit(0); //завершение процесса
         }
     }
 }
