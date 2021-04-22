@@ -28,8 +28,8 @@ namespace Snake {
         public void SetDirection(Direction direction) {
             _direction = direction;
         }
-        public void Move(Direction direction) {
-            switch (direction) {
+        public void Move() {
+            switch (_direction) {
                 case Direction.UP:
                     _body[_body.Length - 1].Item2 += 1;
                     /*for (int index = _body.Length; index >= 0; index--) {
@@ -37,10 +37,13 @@ namespace Snake {
                     }*/
                     break;
                 case Direction.DOWN:
+                    _body[_body.Length - 1].Item2 -= 1;
                     break;
                 case Direction.LEFT:
+                    _body[_body.Length - 1].Item1 -= 1;
                     break;
                 case Direction.RIGHT:
+                    _body[_body.Length - 1].Item1 += 1;
                     break;
                 default:
                     break;

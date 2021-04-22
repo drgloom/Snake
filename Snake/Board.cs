@@ -26,16 +26,28 @@ namespace Snake {
             switch (_snake1.GetDirection()) {
                 case Direction.UP :
                     if (_board[snake_head_x, snake_head_y + 1]._type == CellType.EMPTY) {
-                        _snake1.Move(Direction.UP);
+                        _snake1.Move();
                     }
                     _board[snake_tail_x, snake_tail_y]._type = CellType.EMPTY;
-                    DrawSnake();
                     break;
                 case Direction.DOWN :
+                    if (_board[snake_head_x, snake_head_y - 1]._type == CellType.EMPTY) {
+                        _snake1.Move();
+                    }
+                    _board[snake_tail_x, snake_tail_y]._type = CellType.EMPTY;
                     break;
                 case Direction.LEFT :
+                    if (_board[snake_head_x - 1, snake_head_y]._type == CellType.EMPTY) {
+                        _snake1.Move();
+                    }
+                    _board[snake_tail_x, snake_tail_y]._type = CellType.EMPTY;
                     break;
                 case Direction.RIGHT :
+                    if (_board[snake_head_x + 1, snake_head_y]._type == CellType.EMPTY) {
+                        _snake1.Move();
+                    }
+                    _board[snake_tail_x, snake_tail_y]._type = CellType.EMPTY;
+                    break;
                 default:
                     break;
             }

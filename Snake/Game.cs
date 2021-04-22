@@ -21,10 +21,12 @@ namespace Snake {
         public void Stepper() {
             while (true) {
                 //_board.spawnFood();
-                //_board.MoveSnake();
+
                 //_board.drawSnake();
+                _board.MoveSnake();
                 _board.CalcBoard();
                 _board.DrawBoard();
+
                 Console.WriteLine(_board.GetDirection());
                 Console.WriteLine(_cki.Key);
                 Thread.Sleep(1000);
