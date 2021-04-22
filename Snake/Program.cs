@@ -1,10 +1,18 @@
 ﻿using System;
+using System.Threading;
 
 namespace Snake {
     class Program {
         static void Main(string[] args) {
-            Board board = new Board(20);
-            board.print();
+            Game game = new Game(10);
+            game.Start();
+            //game.start();
+            //Console.WriteLine("1");
+            //Thread.Sleep(1000);
+            //Console.WriteLine("2");
+            //Board board = new Board(20);
+            //board._board[0, 0]._type = CellType.FOOD;
+            //board.print();
             {
         /*  Console.WriteLine(" ");
 
@@ -217,8 +225,8 @@ namespace Snake {
 
             Console.WriteLine(" "); */
         }
-            string key;
-            bool run = true;
+            //string key;
+            //bool run = true;
 /*            while (run) {
                 Console.WriteLine("1. Начать новую игру");
                 Console.WriteLine("2. Присоединиться");
