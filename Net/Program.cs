@@ -48,12 +48,12 @@ namespace Snake
                 stream.Write(data, 0, data.Length);
  
                 // запускаем новый поток для получения данных
-                //Thread receiveThread = new Thread(new ThreadStart((() => client2.ProcessClient())));
-                //receiveThread.Start(); //старт потока
+                Thread receiveThread = new Thread(new ThreadStart((() => NetClient.ReceiveMessage(stream,client))));
+                receiveThread.Start(); //старт потока
                 Console.WriteLine("Добро пожаловать, {0}", userName);
                 while (true)
                 {
-                    NetClient.ProcessClient(stream,client);
+                    NetClient.PushDirection(stream);
                 }
                 //NetClient.SendMessage(stream);
             }
@@ -64,6 +64,16 @@ namespace Snake
             finally
             {
                 NetClient.Disconnect(stream,client);
+            }
+        }
+
+        static public void Game(NetworkStream stream)
+        {
+            while (true)
+            {
+                var snake = new SnakeObj();
+                snake._direction = NetClient.GetDirection(stream);
+                Console.WriteLine(snake._direction);  
             }
         }
         

@@ -33,17 +33,15 @@ namespace Snake
                 string message = GetMessage();
                 userName = message;
                 Console.WriteLine($"{userName} : Подключился к серверу");
+                Thread receiveThread = new Thread(new ThreadStart(() => Program.Game(Stream)));
+                receiveThread.Start(); //старт потока
                 while (true)
                 {
                     var temp = _board.PushBoard();
+                    Console.WriteLine(temp);
                     server.BroadcastMessage(temp, Id);
                     Thread.Sleep(1000);
-                    /*
-                    var key = GetMessage(Stream);
-                    var snake = new SnakeObj();
-                    snake._direction = GetDirection(Stream);
-                    Console.WriteLine(snake._direction);
-                    */
+                    
                 }
 
                 /*
@@ -85,23 +83,6 @@ namespace Snake
             Board board= new Board(10);
             Thread receiveThread = new Thread(new ThreadStart(() => PushDirection(stream)));
             receiveThread.Start(); //старт потока
-            try
-            {
-                while (true)
-                {
-                    message = GetMessage(stream);
-                    board.GetBoard(message);
-                    board.DrawBoard();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            finally
-            {
-                Disconnect(stream,client);
-            }
         }
         
         private static string GetMessage(NetworkStream stream)
@@ -163,20 +144,13 @@ namespace Snake
         {
             while (true)
             {
+                Board board = new Board();
+                string message;
                 try
                 {
-                    byte[] data = new byte[64]; // буфер для получаемых данных
-                    StringBuilder builder = new StringBuilder();
-                    int bytes = 0;
-                    do
-                    {
-                        bytes = stream.Read(data, 0, data.Length);
-                        builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-                    }
-                    while (stream.DataAvailable);
- 
-                    string message = builder.ToString();
-                    Console.WriteLine(message);//вывод сообщения
+                    message = GetMessage(stream);
+                    board.SerializeBoard(message);
+
                 }
                 catch
                 {
@@ -223,6 +197,7 @@ namespace Snake
                 var res = JsonSerializer.Serialize(snake);
                 Console.WriteLine(res);
                 SendMessage(stream, res);
+                Thread.Sleep(1000);
             }
         }
         static public Direction GetDirection(NetworkStream stream)

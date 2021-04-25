@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 
@@ -161,22 +162,19 @@ namespace Snake {
         }
     }
 
-    public void GetBoard(string json)
+    public void SerializeBoard(string json)
     {
+        
         try
         {
-            Console.WriteLine("test");
-            var temp = JsonSerializer.Deserialize<Board>(json);
-            _board = temp._board;
-            _size = temp._size;
-            _snake1 = temp._snake1;
-            _snake2 = temp._snake2;
-            DrawBoard();
+            var temp = JsonSerializer.Deserialize<BoardTest>(json);
+            BoardTest board = new BoardTest(temp.line, temp.size);
+            board.DrawBoard();
         }
-        catch
+        catch (Exception e)
         {
-            Console.WriteLine("Ошибка принятогго класса!"); //соединение было прервано
-            Console.ReadLine();
+            Console.WriteLine(e.Message);
+            throw new Exception(e.Message);
         }
     }
 
@@ -185,18 +183,8 @@ namespace Snake {
         //DrawBoard();
         //Board temp = new Board(_board,_size,_snake1,_snake2);
         //temp.DrawBoard();
-        Cell[,] temp = new Cell[_size,_size];
-        //temp = _board;
-        for (int i = 0; i < _size; i++)
-        {
-            for (int j = 0; j < _size; j++)
-            {
-                temp[i, j]._type = CellType.EMPTY;
-            }
-        }
-        Console.WriteLine(temp[1,1]._type);
-        var res = JsonSerializer.Serialize(temp);
-        Console.WriteLine(res);
+        BoardTest board = new BoardTest(_board,_size);
+        var res = JsonSerializer.Serialize(board);
         return res;
     }
 
