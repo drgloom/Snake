@@ -48,7 +48,7 @@ namespace Snake {
                 _board.DrawBoard(step);
                 Console.WriteLine(_board.GetDirection(0));
                 Console.WriteLine(_board.GetDirection(1));
-                Thread.Sleep(200);
+                Thread.Sleep(300);
                 step += 1;
             }
         }
@@ -58,28 +58,36 @@ namespace Snake {
                 _cki = Console.ReadKey();
                 switch (_cki.Key.ToString()) {
                     case "W":
-                        _board.SetDirection(Direction.UP, 0);
+                        if (_board.GetDirection(0) != Direction.DOWN)
+                            _board.SetDirection(Direction.UP, 0);
                         break;
                     case "S":
-                        _board.SetDirection(Direction.DOWN, 0);
+                        if (_board.GetDirection(0) != Direction.UP)
+                            _board.SetDirection(Direction.DOWN, 0);
                         break;
                     case "A":
-                        _board.SetDirection(Direction.LEFT, 0);
+                        if (_board.GetDirection(0) != Direction.RIGHT)
+                            _board.SetDirection(Direction.LEFT, 0);
                         break;
                     case "D":
-                        _board.SetDirection(Direction.RIGHT, 0);
+                        if (_board.GetDirection(0) != Direction.LEFT)
+                            _board.SetDirection(Direction.RIGHT, 0);
                         break;
                     case "UpArrow":
-                        _board.SetDirection(Direction.UP, 1);
+                        if (_board.GetDirection(1) != Direction.DOWN)
+                            _board.SetDirection(Direction.UP, 1);
                         break;
                     case "DownArrow":
-                        _board.SetDirection(Direction.DOWN, 1);
+                        if (_board.GetDirection(1) != Direction.UP)
+                            _board.SetDirection(Direction.DOWN, 1);
                         break;
                     case "LeftArrow":
-                        _board.SetDirection(Direction.LEFT, 1);
+                        if (_board.GetDirection(1) != Direction.RIGHT)
+                            _board.SetDirection(Direction.LEFT, 1);
                         break;
                     case "RightArrow":
-                        _board.SetDirection(Direction.RIGHT, 1);
+                        if (_board.GetDirection(1) != Direction.LEFT)
+                            _board.SetDirection(Direction.RIGHT, 1);
                         break;
                     default:
                         break;
