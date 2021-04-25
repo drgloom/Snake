@@ -16,7 +16,7 @@ namespace Snake
         private const int port = 8888;
         static TcpClient client;
         static NetworkStream stream;
-        
+
         static private void Server()
         {
             Console.WriteLine("проверка");
@@ -48,10 +48,14 @@ namespace Snake
                 stream.Write(data, 0, data.Length);
  
                 // запускаем новый поток для получения данных
-                Thread receiveThread = new Thread(new ThreadStart((() => NetClient.ReceiveMessage(stream,client))));
-                receiveThread.Start(); //старт потока
+                //Thread receiveThread = new Thread(new ThreadStart((() => client2.ProcessClient())));
+                //receiveThread.Start(); //старт потока
                 Console.WriteLine("Добро пожаловать, {0}", userName);
-                NetClient.SendMessage(stream);
+                while (true)
+                {
+                    NetClient.ProcessClient(stream,client);
+                }
+                //NetClient.SendMessage(stream);
             }
             catch (Exception ex)
             {
@@ -62,9 +66,11 @@ namespace Snake
                 NetClient.Disconnect(stream,client);
             }
         }
+        
         static void Main(string[] args)
         {
             int num;
+            NetClient client2;
             Console.WriteLine("1 сервер 2 клиент");
             num = Convert.ToInt32(Console.ReadLine());
             switch (num)
@@ -79,7 +85,6 @@ namespace Snake
                     Console.WriteLine("проверка");
                     break;
             }
-            
         }
     }
 }
