@@ -17,7 +17,7 @@ namespace Snake {
         private Direction _direction1;
         private SnakeObj _snake2;
         private Direction _direction2;
-        public Board(int size = 10) {
+        public Board(int size = 10, byte snakesNum = 0) {
             _size = size;
             _board = new Cell[_size, _size];
             for (int x = 0; x < _size; x++) {
@@ -31,49 +31,101 @@ namespace Snake {
                     _prevBoard[x, y] = new Cell();
                 }
             }
-            _snake1 = new SnakeObj();
+            _snake1 = new SnakeObj(0, 0, 0);
             _board[0, 0]._type = CellType.SNAKE1;
-
-        }
-        public bool CalcNextTurn() {
-            for (int x = 0; x < _size; x++) {
-                for (int y = 0; y < _size; y++) {
-                    _prevBoard[x, y]._type = _board[x, y]._type;
-                }
+            _direction1 = Direction.UP;
+            if (snakesNum == 1) {
+                _snake2 = new SnakeObj(_size - 1, _size - 1, 1);
+                _board[_size - 1, _size - 1]._type = CellType.SNAKE2;
+                _direction2 = Direction.DOWN;
             }
+        }
+        public byte CalcNextTurn() {
+            CopyBoard(ref _board, ref _prevBoard);
+            byte result;
             (int x, int y) headPoint = _snake1.GetHeadPoint();
             (int x, int y) tailPoint = _snake1.GetTailPoint();
             switch (_direction1) {
-                case Direction.UP   : return CalcSnake(headPoint, tailPoint, 0, 1);
-                case Direction.DOWN : return CalcSnake(headPoint, tailPoint, 0, -1);
-                case Direction.LEFT : return CalcSnake(headPoint, tailPoint, -1, 0);
-                case Direction.RIGHT: return CalcSnake(headPoint, tailPoint, 1, 0);
-                default             : return true;
+                case Direction.UP:
+                    result = CalcSnake(headPoint, tailPoint, 0, 1, ref _snake1);
+                    break;
+                case Direction.DOWN:
+                    result = CalcSnake(headPoint, tailPoint, 0, -1, ref _snake1);
+                    break;
+                case Direction.LEFT:
+                    result = CalcSnake(headPoint, tailPoint, -1, 0, ref _snake1);
+                    break;
+                case Direction.RIGHT:
+                    result = CalcSnake(headPoint, tailPoint, 1, 0, ref _snake1);
+                    break;
+                default:
+                    result = 0;
+                    break;
             }
+            if (result == 0 && _snake2 != null) {
+                headPoint = _snake2.GetHeadPoint();
+                tailPoint = _snake2.GetTailPoint();
+                switch (_direction2) {
+                    case Direction.UP:
+                        result = CalcSnake(headPoint, tailPoint, 0, 1, ref _snake2);
+                        break;
+                    case Direction.DOWN:
+                        result = CalcSnake(headPoint, tailPoint, 0, -1, ref _snake2);
+                        break;
+                    case Direction.LEFT:
+                        result = CalcSnake(headPoint, tailPoint, -1, 0, ref _snake2);
+                        break;
+                    case Direction.RIGHT:
+                        result = CalcSnake(headPoint, tailPoint, 1, 0, ref _snake2);
+                        break;
+                    default:
+                        result = 0;
+                        break;
+                }
+            }
+            return result;
         }
-        private bool CalcSnake((int x, int y) headPoint, (int x, int y) tailPoint, int xOffset, int yOffset) {
-            if (IsOutOfBorder(headPoint)) return false;
+        private byte CalcSnake((int x, int y) headPoint, (int x, int y) tailPoint, int xOffset, int yOffset, ref SnakeObj snake) {
+            if (IsOutOfBorder(headPoint, snake._snakeIndex)) {
+                if (snake._snakeIndex == 0) return 2;
+                else return 1;
+            }
             else if (_board[headPoint.x + xOffset, headPoint.y + yOffset]._type == CellType.EMPTY) {
                 _board[tailPoint.x, tailPoint.y]._type = CellType.EMPTY;
-                _snake1.Move(false, _direction1);
-                _board[_snake1.GetHeadPoint().x, _snake1.GetHeadPoint().y]._type = CellType.SNAKE1;
-                return true;
+                if (snake._snakeIndex == 0) snake.Move(false, _direction1);
+                else snake.Move(false, _direction2);
+                if (snake._snakeIndex == 0) _board[snake.GetHeadPoint().x, snake.GetHeadPoint().y]._type = CellType.SNAKE1;
+                else _board[snake.GetHeadPoint().x, snake.GetHeadPoint().y]._type = CellType.SNAKE2;
+                return 0;
             }
             else if (_board[headPoint.x + xOffset, headPoint.y + yOffset]._type == CellType.FOOD) {
-                _snake1.Move(true, _direction1);
-                _board[_snake1.GetHeadPoint().x, _snake1.GetHeadPoint().y]._type = CellType.SNAKE1;
+                if (snake._snakeIndex == 0) snake.Move(true, _direction1);
+                else snake.Move(true, _direction2);
+                if (snake._snakeIndex == 0) _board[snake.GetHeadPoint().x, snake.GetHeadPoint().y]._type = CellType.SNAKE1;
+                else _board[snake.GetHeadPoint().x, snake.GetHeadPoint().y]._type = CellType.SNAKE2;
                 SpawnFood();
-                return true;
+                return 0;
             }
-            else return false;
+            else if (snake._snakeIndex == 0) return 2;
+            else return 1;
         }
-        private bool IsOutOfBorder((int x, int y) headPoint) {
-            switch (_direction1) {
+        private bool IsOutOfBorder((int x, int y) headPoint, byte snakeIndex) {
+            Direction direction;
+            if (snakeIndex == 0) direction = _direction1;
+            else direction = _direction2;
+            switch (direction) {
                 case Direction.UP   : return headPoint.y + 1 >= _size;
                 case Direction.DOWN : return headPoint.y - 1 < 0;
                 case Direction.LEFT : return headPoint.x - 1 < 0;
                 case Direction.RIGHT: return headPoint.x + 1 >= _size;
                 default             : return false;
+            }
+        }
+        private void CopyBoard(ref Cell[,] board, ref Cell[,] prevBoard) {
+            for (int x = 0; x < _size; x++) {
+                for (int y = 0; y < _size; y++) {
+                    prevBoard[x, y]._type = board[x, y]._type;
+                }
             }
         }
         public void SetDirection(Direction direction, byte snake) {

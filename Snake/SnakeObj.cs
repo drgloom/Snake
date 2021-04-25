@@ -5,8 +5,10 @@ using System.Text;
 namespace Snake {
     class SnakeObj {
         private (int x, int y)[] _body;
-        public SnakeObj(int x = 0, int y = 0, Direction direction = Direction.UP) {
+        public byte _snakeIndex { get; set; }
+        public SnakeObj(int x = 0, int y = 0, byte snakeIndex = 0) {
             _body = new (int, int)[1] { (x, y) };
+            _snakeIndex = snakeIndex;
         }
         public int GetLastIndex() {
             return _body.Length - 1;
@@ -55,19 +57,19 @@ namespace Snake {
                 }
             }
         }
-        private void EatMove(int x, int y) {
+        private void EatMove(int xOffset, int yOffset) {
             Array.Resize(ref _body, _body.Length + 1);
-            _body[_body.Length - 1].x = _body[_body.Length - 2].x + x;
-            _body[_body.Length - 1].y = _body[_body.Length - 2].y + y;
+            _body[_body.Length - 1].x = _body[_body.Length - 2].x + xOffset;
+            _body[_body.Length - 1].y = _body[_body.Length - 2].y + yOffset;
         }
-        private void JustMove(int x, int y) {
+        private void JustMove(int xOffset, int yOffset) {
             if (_body.Length > 1) {
                 for (int index = 0; index < _body.Length - 1; index++) {
                     _body[index] = _body[index + 1];
                 }
             }
-            if (x != 0) _body[_body.Length - 1].x += x;
-            if (y != 0) _body[_body.Length - 1].y += y;
+            if (xOffset != 0) _body[_body.Length - 1].x += xOffset;
+            if (yOffset != 0) _body[_body.Length - 1].y += yOffset;
         }
     }
 }

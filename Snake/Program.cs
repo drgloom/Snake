@@ -4,7 +4,7 @@ using System.Threading;
 namespace Snake {
     class Program {
         static void Main(string[] args) {
-            Game game = new Game(20);
+            Game game = new Game(20, 1);
             game.Start();
             //game.start();
             //Console.WriteLine("1");
