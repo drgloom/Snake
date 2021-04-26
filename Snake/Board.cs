@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Text.Json;
 
 namespace Snake {
     enum Direction {
@@ -39,6 +38,10 @@ namespace Snake {
                 _board[_size - 1, _size - 1]._type = CellType.SNAKE2;
                 _direction2 = Direction.DOWN;
             }
+        }
+        public int GetSize()
+        {
+            return _size;
         }
         public byte CalcNextTurn() {
             CopyBoard(ref _board, ref _prevBoard);
